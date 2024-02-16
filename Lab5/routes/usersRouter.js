@@ -6,11 +6,9 @@ const router = express.Router();
 
 router.post("/login", userController.login);
 
-router.get("/:userId/todos", userController.getTodoOfUser);
-
 router
   .route("/")
-  .get(userController.getAllUsers)
+  .get(authController.protect, userController.getAllUsers)
   .post(userController.createUser);
 
 router

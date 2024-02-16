@@ -20,9 +20,9 @@ exports.protect = async (req, res, next) => {
       token,
       "secret-and-secure-and-long-passwd"
     );
-
     //Check if user still exists
-    const freshUser = await User.findById(decoded.id);
+    const user = await User.findById(decoded.id);
+    req.user = user;
     if (!freshUser) {
       return next(new AppError("The user does no longer exist.", 401));
     }

@@ -7,19 +7,19 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: [true, "User must have a name"],
       unique: true,
-      minlength: 8,
+      minlength: [8, "Min length of title is 8"],
     },
     firstName: {
       type: String,
       required: [true, "User must have a first name"],
-      minlength: 3,
-      maxlength: 15,
+      minlength: [3, "Min length of title is 3"],
+      maxlength: [15, "Max length of title is 15"],
     },
     lastName: {
       type: String,
       required: [true, "User must have a last name"],
-      minlength: 3,
-      maxlength: 15,
+      minlength: [3, "Min length of title is 3"],
+      maxlength: [15, "Max length of title is 15"],
     },
     dob: {
       type: Date,
@@ -27,7 +27,7 @@ const userSchema = new mongoose.Schema(
     password: {
       type: String,
       required: [true, "User must have a password"],
-      minlength: 8,
+      minlength: [8, "Min length of title is 8"],
     },
   },
   {

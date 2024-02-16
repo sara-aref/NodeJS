@@ -5,7 +5,7 @@ const jwt = require("jsonwebtoken");
 
 const signToken = (id) => {
   return jwt.sign({ id }, "secret-and-secure-and-long-passwd", {
-    expiresIn: "90d",
+    expiresIn: "6d",
   });
 };
 
@@ -35,7 +35,7 @@ exports.getUser = async (req, res, next) => {
     if (!user) {
       return next(new AppError("This user doesn't exist", 404));
     }
-    if()
+
     res.status(200).json({
       status: "success",
       data: {
@@ -50,19 +50,6 @@ exports.getUser = async (req, res, next) => {
   }
 };
 
-exports.getTodoOfUser = async (req, res, next) => {
-  try {
-    const todoOfUser = await Todo.find();
-
-    
-
-  } catch {
-
-
-
-  }
-}
-
 exports.deleteUser = async (req, res) => {
   try {
     const user = await User.findByIdAndDelete(req.params.id);
@@ -70,13 +57,7 @@ exports.deleteUser = async (req, res) => {
     if (!user) {
       return next(new AppError("This user doesn't exist", 404));
     }
-    const token = req.headers.authorizations;
-    let userId = '';
-    jwt.verify(token,'secret-and-secure-and-long-passwd',(err,dec) => {
 
-    }
-    userId = dec.user
-    )
     res.status(200).json({
       status: "success",
       message: "User deleted successfully",
@@ -112,21 +93,36 @@ exports.createUser = async (req, res) => {
 
 exports.updateUser = async (req, res, next) => {
   try {
-    const updatedUser = await User.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-      runValidators: true,
-    });
+    const user = await User.findById(req.params.id);
 
-    if (!updatedUser) {
-      return next(new AppError("This user doesn't exist", 404));
+    if (user._id == req.user.id) {
+      const updatedUser = await User.findByIdAndUpdate(
+        req.params.id,
+        req.body,
+        {
+          new: true,
+          runValidators: true,
+        }
+      );
+
+      if (!updatedUser) {
+        return next(new AppError("This user doesn't exist", 404));
+      }
+
+      return res.status(200).json({
+        status: "success",
+        data: {
+          updatedUser,
+        },
+      });
+    } else {
+      console.log(updatedUser._id);
+      console.log(req.user.id);
+      return res.status(403).json({
+        status: "fail",
+        message: "You do not have permission to update this user",
+      });
     }
-
-    res.status(200).json({
-      status: "success",
-      data: {
-        updatedUser,
-      },
-    });
   } catch (err) {
     res.status(404).json({
       status: "fail",

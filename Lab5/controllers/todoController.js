@@ -29,12 +29,19 @@ exports.getTodo = async (req, res) => {
   try {
     const todo = await Todo.findById(req.params.id);
 
-    res.status(200).json({
-      status: "success",
-      data: {
-        todo,
-      },
-    });
+    if (todo.userId == req.user.id) {
+      return res.status(200).json({
+        status: "success",
+        data: {
+          todo,
+        },
+      });
+    } else {
+      return res.status(403).json({
+        status: "fail",
+        message: "You do not have permission to this Todo",
+      });
+    }
   } catch (err) {
     res.status(404).json({
       status: "fail",
@@ -45,18 +52,25 @@ exports.getTodo = async (req, res) => {
 
 exports.deleteTodo = async (req, res) => {
   try {
-    const todo = await Todo.findByIdAndDelete(req.params.id);
+    const todo = await Todo.findById(req.params.id);
 
-    res.status(204).json({
-      status: "success",
-      data: {
-        todo,
-      },
-    });
+    if (todo.userId == req.user.id) {
+      const deletedtodo = await Todo.findByIdAndDelete(req.params.id);
+
+      return res.status(204).json({
+        status: "success",
+        message: "Task deleted succefully",
+      });
+    } else {
+      return res.status(403).json({
+        status: "fail",
+        message: "You do not have permission to delete this Todo",
+      });
+    }
   } catch (err) {
     res.status(404).json({
       status: "fail",
-      message: err,
+      message: err.message,
     });
   }
 };
@@ -81,21 +95,34 @@ exports.createTodo = async (req, res) => {
 
 exports.updateTodo = async (req, res) => {
   try {
-    const updatedTodo = await Todo.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-      runValidators: true,
-    });
+    const todo = await Todo.findById(req.params.id);
 
-    res.status(200).json({
-      status: "success",
-      data: {
-        updatedTodo,
-      },
-    });
+    if (todo.userId == req.user.id) {
+      const updatedTodo = await Todo.findByIdAndUpdate(
+        req.params.id,
+        req.body,
+        {
+          new: true,
+          runValidators: true,
+        }
+      );
+
+      return res.status(200).json({
+        status: "success",
+        data: {
+          updatedTodo,
+        },
+      });
+    } else {
+      return res.status(403).json({
+        status: "fail",
+        message: "You do not have permission to update this Todo",
+      });
+    }
   } catch (err) {
     res.status(404).json({
       status: "fail",
-      message: err,
+      message: err.message,
     });
   }
 };
